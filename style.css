@@ -1,0 +1,368 @@
+        :root {
+            --bg: #1a0a05;
+            --fg: #fff5e6;
+            --accent: #ff8c00;
+            --accent2: #ffdd00;
+            --muted: #2a1a0a;
+            --card: #3a1a0a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            position: fixed; /* Impede scroll bounce no iOS */
+            inset: 0;
+        }
+
+        #gameContainer {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #4a1381 0%, #572514 45%, #4a1381 100%);
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #gameCanvas {
+            display: block;
+            background: transparent;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ============================================
+           UI STYLES
+           ============================================ */
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            pointer-events: none;
+            z-index: 10;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ui-panel {
+            display: none;
+            background: rgba(113, 58, 175, 0.88);
+            border: 1px solid rgba(255, 140, 0, 0.4);
+            border-radius: 10px;
+            padding: 12px 20px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 24px rgba(255, 140, 0, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.45);
+        }
+
+        .ui-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .ui-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--fg);
+        }
+
+        /* Combined Level & Score Display */
+        #levelScoreDisplay {
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent2);
+            letter-spacing: 2px;
+            background: rgba(91, 41, 185, 0.664);
+            border: 1px solid rgba(212, 0, 255, 0.548);
+            border-radius: 10px;
+            padding: 12px 20px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 24px rgba(183, 0, 255, 0.726), inset 0 0 20px rgba(0, 0, 0, 0.45);
+            text-transform: uppercase;
+        }
+
+        /* Esconde dicas de teclado no mobile */
+        .controls-hint {
+            display: flex;
+            gap: 20px;
+            pointer-events: none;
+            z-index: 10;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .key-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.596);
+        }
+
+        .key {
+            background: rgba(162, 0, 255, 0.719);
+            border: 1px solid rgba(140, 0, 255, 0.541);
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        /* ============================================
+           SCREENS (START/OVER)
+           ============================================ */
+        #startScreen, #gameOverScreen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(56, 27, 80, 0.95);
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        #gameOverScreen {
+            display: none;
+        }
+
+        .game-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(32px, 8vw, 72px);
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: var(--fg);
+            margin-bottom: 10px;
+        }
+
+        .game-subtitle {
+            font-size: clamp(14px, 3vw, 20px);
+            color: var(--accent);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+        }
+
+        .start-btn {
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            padding: 16px 48px;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            pointer-events: auto;
+        }
+
+        .start-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--accent);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+
+        .start-btn:hover {
+            color: var(--bg);
+        }
+
+        .start-btn:hover::before {
+            transform: translateX(0);
+        }
+
+        .final-score {
+            font-family: 'Orbitron', monospace;
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--accent);
+            margin: 20px 0;
+        }
+
+        /* ============================================
+           MOBILE: LANDSCAPE WARNING
+           ============================================ */
+        #rotateWarning {
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            inset: 0;
+            background: rgb(119, 0, 255);
+            color: white;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #rotateWarning svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+            fill: var(--accent);
+            animation: rotateAnim 1.5s infinite ease-in-out;
+        }
+
+        @keyframes rotateAnim {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(90deg); }
+        }
+
+        /* Se for tela pequena (celular) E estiver em retrato, mostra o aviso */
+        @media (max-width: 600px) and (orientation: portrait) {
+            #rotateWarning {
+                display: flex;
+            }
+        }
+
+        /* ============================================
+           MOBILE: TOUCH CONTROLS
+           ============================================ */
+        .touch-controls {
+            display: none; /* Escondido no desktop */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 140px;
+            padding: 0 20px 20px 20px;
+            pointer-events: none; /* Deixa os botões serem os únicos clicáveis */
+            z-index: 50;
+            touch-action: none;
+        }
+
+        /* Container para botões esquerda/direita */
+        .left-controls {
+            position: absolute;
+            left: 20px;
+            bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Container para botão de pulo */
+        .right-controls {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+        }
+
+        .touch-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(234, 0, 255, 0.582);
+            border: 2px solid rgba(174, 0, 255, 0.781);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            pointer-events: auto; /* Reativa o clique apenas nos botões */
+            box-shadow: 0 0 15px rgba(255, 140, 0, 0.2);
+            user-select: none;
+            transition: background 0.1s;
+        }
+
+        .touch-btn:active {
+            background: rgba(174, 0, 255, 0.637);
+            transform: scale(0.95);
+        }
+
+        .touch-btn.action-btn {
+            width: 90px;
+            height: 90px;
+            background: rgba(183, 0, 255, 0.747);
+            border-color: rgba(234, 0, 255, 0.671);
+            color: var(--accent2);
+            box-shadow: 0 0 15px rgba(162, 0, 255, 0.616);
+        }
+        
+        .touch-btn.action-btn:active {
+            background: rgba(195, 0, 255, 0.61);
+        }
+
+        /* Ícones SVG dentro dos botões */
+        .touch-btn svg {
+            width: 32px;
+            height: 32px;
+            fill: currentColor;
+        }
+
+        /* Mostra controles touch apenas em telas pequenas/touch */
+        @media (max-width: 1024px), (hover: none) {
+            .controls-hint {
+                display: none; /* Esconde dicas de teclado */
+            }
+            .touch-controls {
+                display: block;
+            }
+            #ui {
+                top: 10px;
+                left: 10px;
+                right: 10px;
+            }
+            .ui-panel {
+                padding: 8px 12px;
+            }
+            .ui-value {
+                font-size: 18px;
+            }
+            .ui-title {
+                font-size: 8px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .touch-btn {
+                width: 60px;
+                height: 60px;
+            }
+            .touch-btn.action-btn {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
